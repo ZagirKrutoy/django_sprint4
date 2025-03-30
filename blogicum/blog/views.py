@@ -13,6 +13,7 @@ from django.utils.decorators import method_decorator
 from django.core.paginator import Paginator
 from .forms import PostForm, UserForm, CommentForm
 from django.urls import reverse_lazy
+from django.urls import reverse
 
 
 class IndexListView(ListView):
@@ -23,7 +24,7 @@ class IndexListView(ListView):
         pub_date__lte=now(),
         is_published__exact=True,
         category__is_published=True,
-    ).order_by('-pub_date')[:5]
+    ).order_by('-pub_date')
     paginate_by = 10
 
 
@@ -144,8 +145,8 @@ class CreatePostView(CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        # Перенаправляем на детальную страницу после создания
-        return self.object.get_absolute_url()
+        return reverse('blog:profile',
+                       kwargs={'username': self.request.user.username})
 
 
 class PostDeleteView(DeleteView):
