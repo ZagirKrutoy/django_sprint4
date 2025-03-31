@@ -45,23 +45,19 @@ class PostDetailView(DetailView):
     template_name = "blog/detail.html"
     context_object_name = "post"
 
-    def get_queryset(self):
-        return Post.objects.filter(
-            pub_date__lte=now(),
-        )
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         # Записываем в переменную form пустой объект формы.
-        context['form'] = CommentForm()
-        # Запрашиваем все поздравления для выбранного дня рождения.
-        context['comments'] = (
-            # Дополнительно подгружаем авторов комментариев,
-            # чтобы избежать множества запросов к БД.
-            self.object.comments.select_related('author')
-        )
+        context['form'] = CommentForm()  # <-- возможно, проблема здесь
+        context['comments'] = self.object.comments.select_related('author')
         return context
+
+    def get_queryset(self):
+        if self.request.user.is_authenticated:
+            return Post.objects.filter(
+                is_published=True
+            ) | Post.objects.filter(author=self.request.user)
+        return Post.objects.filter(is_published=True)
 
 
 '''def post_detail(request, id):
