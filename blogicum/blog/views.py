@@ -161,7 +161,9 @@ class PostDeleteView(UserPassesTestMixin, DeleteView):
 
     def test_func(self):
         post = self.get_object()
-        return self.request.user == post.author or self.request.user.is_superuser
+        return (
+            self.request.user == post.author
+            or self.request.user.is_superuser)
 
     def handle_no_permission(self):
         return redirect('blog:post_detail', pk=self.get_object().pk)
