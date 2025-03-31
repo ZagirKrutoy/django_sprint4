@@ -157,7 +157,7 @@ class CreatePostView(CreateView):
 
 class PostDeleteView(UserPassesTestMixin, DeleteView):
     model = Post
-    success_url = reverse_lazy('blog:index') 
+    success_url = reverse_lazy('blog:index')
 
     def test_func(self):
         post = self.get_object()
