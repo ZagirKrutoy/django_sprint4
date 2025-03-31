@@ -156,7 +156,7 @@ class CreatePostView(CreateView):
 
 class PostDeleteView(DeleteView):
     model = Post
-    success_url = reverse_lazy('blog:')
+    success_url = reverse_lazy('blog:index')
 
 
 class EditDeleteView(UpdateView):
