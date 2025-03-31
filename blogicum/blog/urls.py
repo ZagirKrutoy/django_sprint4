@@ -20,7 +20,7 @@ urlpatterns = [
     path('profile/edit',
          views.EditProfileView.as_view(), name='edit_profile'),
     path('posts/create/', views.CreatePostView.as_view(), name='create_post'),
-    path('posts/<int:pk/>/delete',
+    path('posts/<int:pk>/delete',
          views.PostDeleteView.as_view(),
          name='delete_post'),
     path('posts/<int:pk>/edit/',
