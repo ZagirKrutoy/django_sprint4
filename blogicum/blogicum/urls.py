@@ -24,9 +24,9 @@ from django.contrib.auth.forms import UserCreationForm
 from django.views.generic.edit import CreateView
 
 
-handler404 = 'core.views.page_not_found'
-handler403 = 'core.views.csrf_failure'
-handler500 = 'core.views.server_error'
+handler404 = 'pages.views.page_not_found'
+handler403 = 'pages.views.csrf_failure'
+handler500 = 'pages.views.server_error'
 
 urlpatterns = [
     path('', include('blog.urls', namespace='blog')),
@@ -38,7 +38,7 @@ urlpatterns = [
         CreateView.as_view(
             template_name='registration/registration_form.html',
             form_class=UserCreationForm,
-            success_url=reverse_lazy('pages:homepage'),
+            success_url=reverse_lazy('blog:index'),
         ),
         name='registration',
     ),

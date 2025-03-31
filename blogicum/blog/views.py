@@ -12,8 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.core.paginator import Paginator
 from .forms import PostForm, UserForm, CommentForm
-from django.urls import reverse_lazy
-from django.urls import reverse
+from django.urls import reverse_lazy, reverse
 
 
 class IndexListView(ListView):
@@ -26,6 +25,12 @@ class IndexListView(ListView):
         category__is_published=True,
     ).order_by('-pub_date')
     paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        for post in context["post_list"]:
+            post.comment_count = post.comment_count()
+        return context
 
 
 '''def index(request):
@@ -42,8 +47,6 @@ class PostDetailView(DetailView):
     def get_queryset(self):
         return Post.objects.filter(
             pub_date__lte=now(),
-            is_published=True,
-            category__is_published=True
         )
 
     def get_context_data(self, **kwargs):
@@ -108,8 +111,7 @@ class ProfileView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.get_object()
-        posts = Post.objects.filter(author=user,
-                                    is_published=True).order_by('-pub_date')
+        posts = Post.objects.filter(author=user).order_by('-pub_date')
         paginator = Paginator(posts, 10)  # 5 публикаций на страницу
         page_number = self.request.GET.get('page')
         page_obj = paginator.get_page(page_number)
@@ -118,14 +120,17 @@ class ProfileView(DetailView):
 
 
 @method_decorator(login_required, name='dispatch')
-class EditProfileView(CreateView):
+class EditProfileView(UpdateView):
     model = User
     form_class = UserForm
     template_name = 'blog/user.html'
-    context_object_name = 'user'
 
     def get_object(self, queryset=None):
         return self.request.user
+
+    def get_success_url(self):
+        return reverse_lazy('blog:profile',
+                            kwargs={'username': self.request.user.username})
 
 
 @login_required

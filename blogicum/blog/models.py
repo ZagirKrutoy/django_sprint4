@@ -48,6 +48,9 @@ class Post(models.Model):
     def get_absolute_url(self):
         return reverse('blog:post_detail', kwargs={'pk': self.pk})
 
+    def comment_count(self):
+        return self.comments.count()
+
 
 class Category(models.Model):
     title = models.CharField('Заголовок', max_length=256)
