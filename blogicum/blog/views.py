@@ -13,6 +13,7 @@ from django.utils.decorators import method_decorator
 from django.core.paginator import Paginator
 from .forms import PostForm, UserForm, CommentForm
 from django.urls import reverse_lazy, reverse
+from django.contrib.auth.mixins import UserPassesTestMixin
 
 
 class IndexListView(ListView):
@@ -154,9 +155,16 @@ class CreatePostView(CreateView):
                        kwargs={'username': self.request.user.username})
 
 
-class PostDeleteView(DeleteView):
+class PostDeleteView(UserPassesTestMixin, DeleteView):
     model = Post
-    success_url = reverse_lazy('blog:index')
+    success_url = reverse_lazy('blog:index') 
+
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author or self.request.user.is_superuser
+
+    def handle_no_permission(self):
+        return redirect('blog:post_detail', pk=self.get_object().pk)
 
 
 class EditDeleteView(UpdateView):
