@@ -164,11 +164,12 @@ class EditDeleteView(UpdateView):
     form_class = PostForm
     template_name = 'blog/create.html'
 
-    def form_valid(self, form):
-        # Если нужно — проверяем, что только автор может обновлять
-        if form.instance.author != self.request.user:
-            return self.handle_no_permission()
-        return super().form_valid(form)
+    def dispatch(self, request, *args, **kwargs):
+        post = self.get_object()
+        if post.author != request.user:
+            # Если пользователь не автор, перенаправляем на страницу поста
+            return redirect('blog:post_detail', pk=post.pk)
+        return super().dispatch(request, *args, **kwargs)
 
 
 @login_required
